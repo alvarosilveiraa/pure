@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <title>Pure</title>
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <body>
+
+    <header style="width: 100%; height: 50px; background-color: red;"></header>
+
+    <pure-slider width="20%" height="calc(100vh - 50px)" style="margin: 0 auto;">
+      <slide>
+        <img class="responsive-img" draggable="false" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/40288/65d721_4dfa47a05152487fb3bc45ca2ec8fd1e.png">
+      </slide>
+
+      <slide>
+        <h3 style="color: white;">NENJAA</h3>
+      </slide>
+
+      <slide>
+        <h3 style="color: white;">NENJAA</h3>
+        <h3 style="color: white;">NENJAA</h3>
+      </slide>
+
+      <slide style="background-color: grey;">
+      </slide>
+    </pure-slider>
+
+    <script src="js/lib/hammer.min.js"></script>
+    <script src="js/components/iSlider.js"></script>
+    <script src="js/components/SliderHorizontal.js"></script>
+    <script src="js/components/SliderVertical.js"></script>
+    <script src="js/components/Slider.js"></script>
+    <script>
+      const $ = document.querySelector.bind(document);
+      const $all = document.querySelectorAll.bind(document);
+      let slider = new Slider();
+    </script>
+  </body>
+</html>
