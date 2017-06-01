@@ -9,7 +9,8 @@ class iSlider {
     this._count = options.active;
     this._total = options.total;
     this._timer = options.timer;
-    this._content = options.content;
+    this._slides = options.slides;
+    this._tabs = options.tabs;
     this._sensitivity = options.sensitivity;
 
     /****************************** METODOS ************************************/
