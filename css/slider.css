@@ -5,14 +5,18 @@ pure-slider {
 }
 
 pure-slider[orientation="horizontal"] slides {
+  touch-action: pan-y !important;
 	display: flex;
 }
 
 pure-slider[orientation="vertical"] slides {
+  touch-action: pan-x !important;
+  display: block;
 	width: 100%;
 }
 
 pure-slider tabs {
+  position: relative;
 	overflow: hidden;
 	display: block;
 	width: 100%;
@@ -23,12 +27,14 @@ pure-slider tabs tab {
 	float: left;
 }
 
-pure-slider slides {
-	display: block;
+pure-slider tabs tray {
+  position: absolute;
+  bottom: 0;
+  display: block;
 }
 
 pure-slider slides slide {
-	overflow: hidden;
+  overflow: hidden;
 	display: block;
 	width: 100%;
 }

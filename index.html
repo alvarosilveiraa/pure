@@ -2,6 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pure</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" type="text/css" href="css/slider.css">
@@ -13,14 +14,24 @@
     <!-- active -->
     <!-- timer -->
     <!-- sensitivity -->
-    <!-- orientation -->
     <pure-slider>
 
+      <!-- fixed -->
+      <!-- tray-color -->
+      <!-- tray-height -->
       <tabs>
-        <tab>dasdsa</tab>
-        <tab>dsadsad</tab>
-        <tab>dasdsa</tab>
-        <tab>dsad</tab>
+        <tab>
+          Tab 1
+        </tab>
+        <tab>
+          Tab 2
+        </tab>
+        <tab>
+          Tab 3
+        </tab>
+        <tab>
+          Tab 4
+        </tab>
       </tabs>
 
       <slides>
@@ -41,11 +52,11 @@
 
     <script src="js/lib/hammer.min.js"></script>
     <script src="js/slider/iSlider.js"></script>
-    <script src="js/slider/Slider.js"></script>
+    <script src="js/slider/SliderHorizontal.js"></script>
     <script>
       const $ = document.querySelector.bind(document);
       const $all = document.querySelectorAll.bind(document);
-      let slider = new Slider();
+      let slider = new SliderHorizontal();
       slider.init();
     </script>
   </body>
