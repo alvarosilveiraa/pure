@@ -1,9 +1,10 @@
 interface iSlider {
   total: number;
+  active: number;
   width: number;
   height: number;
-  active: number;
   timer: number;
   sensitivity: number;
-  normalizeActive(active: number): void;
+  init(): void;
+  setPage(active: number): void;
 }
