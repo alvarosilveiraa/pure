@@ -38,3 +38,19 @@ pure-slider slides slide {
 	display: block;
 	width: 100%;
 }
+
+
+/******************/
+
+pure-sync {
+  display: block;
+  position: fixed;
+  top: -30px;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  border-radius: 50%;
+  background-color: white;
+  z-index: 9999;
+}
