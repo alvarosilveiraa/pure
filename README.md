@@ -3,15 +3,13 @@
 
  - Download [Pure.js]() and [Pure.css]()
 
-### Scrollable
-
 ### Header
 
-### Sync
+### Refresher
 Execute any function on pan window to bottom while scroll is in top.
 
 ```HTML
-  <sync></sync>
+  <pure-refresher></pure-refresher>
 ```
 
 ### Slider

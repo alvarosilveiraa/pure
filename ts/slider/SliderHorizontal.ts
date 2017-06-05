@@ -5,7 +5,6 @@ class SliderHorizontal implements iSlider {
   private slides: any;
   private tabs: Tabs;
   private scrolling: boolean;
-
   public total: number;
   public active: number;
   public width: number;
@@ -18,22 +17,22 @@ class SliderHorizontal implements iSlider {
     this.slider = slider;
     this.slides = slider.querySelector("slides");
     this.tabs = tabs;
-
     this.total = this.slides.querySelectorAll("slide").length;
     this.active = parseInt(this.getSliderAttribute("active", '0'));
     this.width = parseInt(this.getSliderAttribute("width", '0'));
     this.height = parseInt(this.getSliderAttribute("height", '0'));
     this.timer = parseInt(this.getSliderAttribute("timer", "300"));
     this.sensitivity = parseInt(this.getSliderAttribute("sensitivity", "25"));
+
+    if(tabs) this.tabs.setTabs(this.setPage.bind(this));
+    this.setStyles();
   }
 
   public init(): void {
-    this.setStyles();
-    if(this.tabs) this.tabs.setTabs(this.setPage.bind(this));
     let manager = new Hammer.Manager(this.slides);
     manager.add(new Hammer.Pan({
       direction: Hammer.DIRECTION_HORIZONTAL,
-      threshold: 5,
+      threshold: 0,
       pointers: 0
     }));
     manager.on("panstart", e => {
