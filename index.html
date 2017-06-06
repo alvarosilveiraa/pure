@@ -4,61 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Pure</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/pure.css">
   </head>
   <body>
 
-    <!-- animation -->
-    <!-- pull-text -->
-    <!-- release-text -->
-    <!-- refresh-text -->
-    <pure-refresher></pure-refresher>
+    <pure-navigator>
 
-    <!-- width -->
-    <!-- height -->
-    <!-- active -->
-    <!-- timer -->
-    <!-- sensitivity -->
-    <pure-slider>
+      <page>
+        <pure-refresher></pure-refresher>
 
-      <!-- fixed -->
-      <!-- tray-color -->
-      <!-- tray-height -->
-      <tabs>
-        <tab>
-          Tab 1
-        </tab>
-        <tab>
-          Tab 2
-        </tab>
-        <tab>
-          Tab 3
-        </tab>
-        <tab>
-          Tab 4
-        </tab>
-      </tabs>
+        <pure-slider>
+          <tabs>
+            <tab></tab>
+            <tab></tab>
+            <tab></tab>
+            <tab></tab>
+          </tabs>
 
-      <slides>
-        <slide style="background-color: white;">
-          <p>a</p>
-        </slide>
+          <slides>
+            <slide style="background-color: red;"></slide>
+            <slide style="background-color: blue;"></slide>
+            <slide style="background-color: green;"></slide>
+            <slide style="background-color: orange;"></slide>
+          </slides>
+        </pure-slider>
+      </page>
 
-        <slide style="background-color: white;">
-          <p>b</p>
-        </slide>
-
-        <slide style="background-color: white;">
-          <p>c</p>
-        </slide>
-
-        <slide style="background-color: white;">
-          <p>d</p>
-        </slide>
-      </slides>
-
-    </pure-slider>
+    </pure-navigator>
 
     <script src="js/lib/hammer.min.js"></script>
     <script type="text/javascript" src="js/main.js"></script>

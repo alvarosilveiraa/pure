@@ -51,8 +51,6 @@ module pure {
       this.onRefresh = options.onRefresh?
         options.onRefresh.bind(this):
         done => done();
-
-      this.init();
     }
 
     public init(): void {
