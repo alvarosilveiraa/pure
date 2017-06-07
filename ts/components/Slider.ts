@@ -28,13 +28,13 @@ module pure {
     }
 
     public setPosition(percent: number): void {
-      this.tray.style.left = percent + "%";
+      this.tray.style.left = percent + '%';
     }
 
     public setTimeout(timer: number): void {
-      this.element.style.transition = `transform ${timer}ms cubic-bezier(0.5, 0, 0.5, 1)`;
+      this.tray.style.transition = `left ${timer}ms`;
       this.timeout = setTimeout(() => {
-        this.element.style.transition = '';
+        this.tray.style.transition = '';
       }, timer);
     }
 
@@ -42,7 +42,7 @@ module pure {
       this.tray = document.createElement("tray");
       this.tray.style.width = `${100 / this.length}%`;
       this.tray.style.height = "3px";
-      this.tray.style.backgroundColor = "white";
+      this.tray.style.backgroundColor = "black";
 
       this.element.querySelectorAll("tab").forEach((tab, i) => {
         tab.addEventListener("click", e => click(i));
@@ -171,6 +171,7 @@ module pure {
           , active = Math.round(-1 * calculated / (100 / this.total));
 
         if(calculated < 5 && calculated > -80) {
+          this.tabs.setPosition(-1 * calculated);
           this.slides.setPosition(calculated);
           if(e.isFinal) {
             if(active != this.active) {
@@ -206,8 +207,8 @@ module pure {
     }
 
     public setPage(active: number): void {
-      let percent: number = -(100 / this.total) * this.active;
       this.normalizeActive(active, this.total);
+      let percent: number = -(100 / this.total) * this.active;
       this.tabs.setPosition(-1 * percent);
       this.slides.setPosition(percent);
       clearTimeout(this.tabs.timeout);
