@@ -31,9 +31,71 @@ body {
 }
 
 @keyframes wave-shadow {
-  0%   {box-shadow: 0 0 0 rgba(0,0,0,0.0);}
-  20%  {box-shadow: 0 4px 16px rgba(0,0,0,0.3);}
-  100% {box-shadow: 0 0 0 rgba(0,0,0,0.0);}
+  0%   {box-shadow: 0 0 0 rgba(0, 0, 0, 0.0);}
+  20%  {box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);}
+  100% {box-shadow: 0 0 0 rgba(0, 0, 0, 0.0);}
+}
+
+/******************/
+pure-menu.open.right content {
+  left: 20%;
+  right: 0;
+}
+
+pure-menu.right content {
+  left: 100%;
+  right: -100%;
+}
+
+pure-menu.open.left content {
+  left: 0;
+  right: 20%;
+}
+
+pure-menu.left content {
+  left: -100%;
+  right: 100%;
+}
+
+pure-menu content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  transition: left 200ms, right 200ms;
+  z-index: 10;
+}
+
+pure-menu.open overlay {
+  opacity: 1;
+}
+
+pure-menu overlay {
+  opacity: 0;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  transition: opacity 300ms;
+  z-index: 8;
+}
+
+/******************/
+pure-header {
+  display: block;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  z-index: 6;
 }
 
 /******************/
@@ -48,6 +110,7 @@ pure-navigation page {
   overflow-y: auto;
   display: block;
   position: relative;
+  width: 100%;
   height: 100%;
   background-color: white;
   z-index: 5;
@@ -58,7 +121,7 @@ pure-navigation.android page {
   left: 0;
   right: 0;
   opacity: 0;
-  transition: top 300ms, opacity 300ms;
+  transition: top 300ms ease-out, opacity 300ms ease-out;
 }
 
 pure-navigation.android page.active {
@@ -67,16 +130,25 @@ pure-navigation.android page.active {
   opacity: 1;
 }
 
+pure-navigation.android page.active.behind {
+  top: -30%;
+  opacity: 0.5;
+}
+
 pure-navigation.ios page {
   top: 0;
   left: 100%;
   right: 0;
-  transition: left 300ms;
+  transition: left 300ms ease-out;
 }
 
 pure-navigation.ios page.active {
   position: absolute;
   left: 0;
+}
+
+pure-navigation.ios page.active.behind {
+  left: -30%;
 }
 
 /******************/

@@ -17,10 +17,12 @@ var pure;
 var pure;
 (function (pure) {
     var Header = (function () {
-        function Header(options) {
-            if (options === void 0) { options = {}; }
+        function Header(page) {
+            this.main = page.querySelector("pure-header");
         }
-        Header.prototype.init = function () { };
+        Header.prototype.getHeight = function () {
+            return this.main ? this.main.clientHeight : 0;
+        };
         return Header;
     }());
     pure.Header = Header;
@@ -30,8 +32,28 @@ var pure;
     var Menu = (function () {
         function Menu(options) {
             if (options === void 0) { options = {}; }
+            this.main = pure.$("pure-menu");
+            this.side = options.side || "left";
+            this.timer = options.timer || 300;
         }
-        Menu.prototype.init = function () { };
+        Menu.prototype.init = function () {
+            this.main.classList.add(this.side);
+            this.close();
+        };
+        Menu.prototype.open = function () {
+            this.active = true;
+            this.main.style.display = "block";
+            setTimeout(function () {
+                this.main.classList.add("open");
+            }.bind(this), 0);
+        };
+        Menu.prototype.close = function () {
+            this.active = false;
+            this.main.classList.remove("open");
+            setTimeout(function () {
+                this.main.style.display = "none";
+            }.bind(this), this.timer);
+        };
         return Menu;
     }());
     pure.Menu = Menu;
@@ -43,50 +65,57 @@ var pure;
             if (options === void 0) { options = {}; }
             this.main = pure.$("pure-navigation");
             this.pages = this.main.querySelectorAll("page");
-            this.active = 0;
+            this.menu = options.menu || null;
             this.os = options.os || "android";
-            this.root = options.root;
+            this.root = options.root || "home";
             this.timer = options.timer || 300;
         }
         Navigation.prototype.init = function () {
+            if (this.menu)
+                this.menu.init();
             this.main.classList.add(this.os);
             this.setRoot(this.root);
         };
         Navigation.prototype.setRoot = function (name) {
-            var root;
-            if (name)
-                root = this.getPageByName(name);
-            else
-                root = this.pages[this.active];
+            var root = this.getPageByName(name);
             if (root) {
-                var child = document.createElement("page");
-                child.classList.add("active");
-                child.innerHTML = root.innerHTML;
+                if (this.menu && this.menu.active)
+                    this.menu.close();
+                var child_1 = this.getChild(root);
+                child_1.classList.add("active");
                 this.main.innerHTML = '';
-                this.main.appendChild(child);
+                this.main.appendChild(child_1);
+                this.onLoad(function () {
+                    child_1.style.paddingTop = new pure.Header(child_1).getHeight() + "px";
+                    new pure.Waves();
+                }, 10);
             }
         };
         Navigation.prototype.setPage = function (name) {
             var page = this.getPageByName(name);
             if (page) {
-                var child_1 = document.createElement("page");
-                child_1.innerHTML = page.innerHTML;
-                this.main.appendChild(child_1);
-                setTimeout(function () {
-                    child_1.classList.add("active");
-                }, 0);
+                if (this.menu && this.menu.active)
+                    this.menu.close();
+                var child_2 = this.getChild(page);
+                this.main.appendChild(child_2);
+                this.onLoad(function () {
+                    this.getPageByLengthLessIndex(2).classList.add("behind");
+                    child_2.classList.add("active");
+                    child_2.style.paddingTop = new pure.Header(child_2).getHeight() + "px";
+                    new pure.Waves();
+                }, 10);
             }
         };
-        Navigation.prototype.pop = function (index) {
-            if (index === void 0) { index = 0; }
+        Navigation.prototype.pop = function () {
             var pages = this.main.querySelectorAll("page");
             var _loop_1 = function (i) {
                 var page = pages[i];
                 if (page.classList.contains("active")) {
+                    this_1.getPageByLengthLessIndex(2).classList.remove("behind");
                     page.classList.remove("active");
-                    setTimeout(function () {
+                    this_1.onLoad(function () {
                         this.main.removeChild(page);
-                    }.bind(this_1), this_1.timer);
+                    }, this_1.timer);
                     return { value: void 0 };
                 }
             };
@@ -97,6 +126,12 @@ var pure;
                     return state_1.value;
             }
         };
+        Navigation.prototype.isRoot = function () {
+            return this.main.querySelectorAll("page").length == 1;
+        };
+        Navigation.prototype.onLoad = function (exec, timer) {
+            setTimeout(exec.bind(this), timer);
+        };
         Navigation.prototype.getPageByName = function (name) {
             for (var i = 0; i < this.pages.length; i++) {
                 var page = this.pages[i];
@@ -104,6 +139,18 @@ var pure;
                     return page;
             }
             return null;
+        };
+        Navigation.prototype.getPageByLengthLessIndex = function (i) {
+            if (i === void 0) { i = 1; }
+            var pages = this.main.querySelectorAll("page");
+            return pages[pages.length - i];
+        };
+        Navigation.prototype.getChild = function (page) {
+            var child = document.createElement("page");
+            child.style.cssText = page.style.cssText;
+            child.classList = page.classList;
+            child.innerHTML = page.innerHTML;
+            return child;
         };
         return Navigation;
     }());
@@ -456,36 +503,38 @@ var pure;
 var pure;
 (function (pure) {
     var Waves = (function () {
-        function Waves(options) {
-            if (options === void 0) { options = {}; }
-        }
-        Waves.prototype.init = function () {
+        function Waves() {
             var _this = this;
             pure.$all("[pure-waves]").forEach(function (element) {
-                element.addEventListener("click", function (e) {
-                    //disabled return;
-                    if (!element.style.position || element.style.position === "static")
-                        element.style.position = "relative";
-                    var offset = element.getBoundingClientRect();
-                    var x = e.pageX - offset.left;
-                    var y = e.pageY - offset.top;
-                    var diameter = Math.min(offset.height, offset.width, 100);
-                    var container = document.createElement("div");
-                    container.setAttribute("class", "wave-container");
-                    element.appendChild(container);
-                    var wave = document.createElement("div");
-                    wave.setAttribute("class", "wave");
-                    wave.style.backgroundColor = _this.getAttribute(element.getAttribute("pure-waves"));
-                    wave.style.width = diameter + "px";
-                    wave.style.height = diameter + "px";
-                    wave.style.top = y - (diameter / 2) + "px";
-                    wave.style.left = x - (diameter / 2) + "px";
-                    container.appendChild(wave);
-                    setTimeout(function () {
-                        element.removeChild(container);
-                    }, 2000);
-                });
+                element.addEventListener("click", _this.click(element));
+                element.removeAttribute("pure-waves");
             });
+        }
+        Waves.prototype.click = function (element) {
+            var _this = this;
+            return function (e) {
+                //disabled return;
+                if (!element.style.position || element.style.position === "static")
+                    element.style.position = "relative";
+                var offset = element.getBoundingClientRect();
+                var x = e.pageX - offset.left;
+                var y = e.pageY - offset.top;
+                var diameter = Math.min(offset.height, offset.width, 100);
+                var container = document.createElement("div");
+                container.setAttribute("class", "wave-container");
+                element.appendChild(container);
+                var wave = document.createElement("div");
+                wave.setAttribute("class", "wave");
+                wave.style.backgroundColor = _this.getAttribute(element.getAttribute("wave-color"));
+                wave.style.width = diameter + "px";
+                wave.style.height = diameter + "px";
+                wave.style.top = y - (diameter / 2) + "px";
+                wave.style.left = x - (diameter / 2) + "px";
+                container.appendChild(wave);
+                setTimeout(function () {
+                    element.removeChild(container);
+                }, 2000);
+            };
         };
         Waves.prototype.getAttribute = function (attribute) {
             return attribute || "#FFFFFF";

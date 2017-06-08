@@ -1,7 +1,13 @@
 module pure {
   export class Header {
-    constructor(options: any = {}) {}
+    public main: any;
 
-    public init(): void {}
+    constructor(page: any) {
+      this.main = page.querySelector("pure-header");
+    }
+
+    public getHeight(): number {
+      return this.main? this.main.clientHeight: 0;
+    }
   }
 }
