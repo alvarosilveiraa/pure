@@ -61,26 +61,34 @@ var pure;
             this.main = pure.$("pure-menu");
             if (!this.main)
                 throw new Error("Elemento não encontrado!");
+            this.content = this.main.querySelector("content");
+            this.overlay = this.main.querySelector("overlay");
             this.side = options.side || "left";
             this.timer = options.timer || 300;
         }
         Menu.prototype.init = function () {
+            var _this = this;
             this.main.classList.add(this.side);
-            this.close();
+            this.main.style.display = "none";
+            this.content.style.transition = "transform " + this.timer + "ms, left " + this.timer + "ms, right " + this.timer + "ms";
+            this.overlay.style.transition = "opacity " + this.timer + "ms";
+            this.overlay.onclick = function (e) { return _this.close(); };
         };
         Menu.prototype.open = function () {
             this.active = true;
             this.main.style.display = "block";
             setTimeout(function () {
                 this.main.classList.add("open");
-            }.bind(this), 0);
+            }.bind(this), 10);
         };
         Menu.prototype.close = function () {
-            this.active = false;
-            this.main.classList.remove("open");
-            setTimeout(function () {
-                this.main.style.display = "none";
-            }.bind(this), this.timer);
+            if (this.active) {
+                this.active = false;
+                this.main.classList.remove("open");
+                setTimeout(function () {
+                    this.main.style.display = "none";
+                }.bind(this), this.timer);
+            }
         };
         return Menu;
     }());
@@ -94,7 +102,7 @@ var pure;
             this.main = pure.$("pure-navigation");
             this.pages = this.main.querySelectorAll("page");
             try {
-                this.menu = new pure.Menu();
+                this.menu = new pure.Menu(options.menu);
             }
             catch (e) { }
             this.os = options.os || "android";
@@ -166,8 +174,8 @@ var pure;
         };
         Navigation.prototype.getChild = function (page) {
             var child = document.createElement("page");
-            child.style.cssText = page.style.cssText;
-            child.classList = page.classList;
+            child.setAttribute("style", page.getAttribute("style"));
+            child.setAttribute("class", page.getAttribute("class"));
             child.setAttribute("name", page.getAttribute("name"));
             child.setAttribute("controller", page.getAttribute("controller"));
             child.innerHTML = page.innerHTML;
@@ -530,11 +538,13 @@ var pure;
 (function (pure) {
     var Waves = (function () {
         function Waves() {
-            var _this = this;
-            pure.$all("[pure-waves]").forEach(function (element) {
-                element.addEventListener("click", _this.click(element));
+            this.timer = 800;
+            var waves = pure.$all("[pure-waves]");
+            for (var i = 0; i < waves.length; i++) {
+                var element = waves[i];
+                element.addEventListener("click", this.click(element));
                 element.removeAttribute("pure-waves");
-            });
+            }
         }
         Waves.prototype.click = function (element) {
             var _this = this;
@@ -551,6 +561,7 @@ var pure;
                 element.appendChild(container);
                 var wave = document.createElement("div");
                 wave.setAttribute("class", "wave");
+                wave.style.animation = "wave " + _this.timer + "ms forwards";
                 wave.style.backgroundColor = _this.getAttribute(element.getAttribute("wave-color"));
                 wave.style.width = diameter + "px";
                 wave.style.height = diameter + "px";
@@ -559,7 +570,7 @@ var pure;
                 container.appendChild(wave);
                 setTimeout(function () {
                     element.removeChild(container);
-                }, 2000);
+                }, _this.timer);
             };
         };
         Waves.prototype.getAttribute = function (attribute) {

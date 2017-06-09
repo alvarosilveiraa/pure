@@ -1,7 +1,10 @@
 let touch = new pure.Touch();
 let navigation = new pure.Navigation({
   os: "android",
-  root: "foo"
+  root: "foo",
+  menu: {
+    side: "right"
+  }
 })
 navigation.init();
 

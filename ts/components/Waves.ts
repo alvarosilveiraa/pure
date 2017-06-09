@@ -1,6 +1,11 @@
 module pure {
   export class Waves {
+
+    private timer: number;
+
     constructor() {
+      this.timer = 800;
+
       let waves: Array<any> = $all("[pure-waves]");
       for(let i = 0; i < waves.length; i++) {
         let element = waves[i];
@@ -27,6 +32,7 @@ module pure {
         element.appendChild(container);
         let wave: any = document.createElement("div");
         wave.setAttribute("class", "wave");
+        wave.style.animation = `wave ${this.timer}ms forwards`;
         wave.style.backgroundColor = this.getAttribute(element.getAttribute("wave-color"));
         wave.style.width = diameter + "px";
         wave.style.height = diameter + "px";
@@ -36,7 +42,7 @@ module pure {
 
         setTimeout(function() {
           element.removeChild(container);
-        }, 2000);
+        }, this.timer);
       }
     }
 

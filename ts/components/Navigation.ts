@@ -13,7 +13,7 @@ module pure {
       this.pages = this.main.querySelectorAll("page");
 
       try {
-        this.menu = new Menu();
+        this.menu = new Menu(options.menu);
       }catch(e) {}
 
       this.os = options.os || "android";
