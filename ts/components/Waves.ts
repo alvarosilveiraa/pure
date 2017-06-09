@@ -1,10 +1,12 @@
 module pure {
   export class Waves {
     constructor() {
-      $all("[pure-waves]").forEach(element => {
+      let waves: Array<any> = $all("[pure-waves]");
+      for(let i = 0; i < waves.length; i++) {
+        let element = waves[i];
         element.addEventListener("click", this.click(element));
         element.removeAttribute("pure-waves");
-      })
+      }
     }
 
     private click(element): any {

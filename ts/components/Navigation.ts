@@ -11,38 +11,25 @@ module pure {
     constructor(options: any = {}) {
       this.main = $("pure-navigation");
       this.pages = this.main.querySelectorAll("page");
-      this.menu = options.menu || null;
+
+      try {
+        this.menu = new Menu();
+      }catch(e) {}
+
       this.os = options.os || "android";
       this.root = options.root || "home";
       this.timer = options.timer || 300;
     }
 
     public init(): void {
-      if(this.menu) this.menu.init();
+      if(this.menu)
+        this.menu.init();
+
       this.main.classList.add(this.os);
-      this.setRoot(this.root);
+      this.setPage(this.root, true);
     }
 
-    public setRoot(name: string): void {
-      let root: any = this.getPageByName(name);
-      if(root) {
-
-        if(this.menu && this.menu.active)
-          this.menu.close();
-
-        let child: any = this.getChild(root);
-        child.classList.add("active");
-        this.main.innerHTML = '';
-        this.main.appendChild(child);
-
-        this.onLoad(function() {
-          child.style.paddingTop = new Header(child).getHeight() + "px";
-          new Waves();
-        }, 10);
-      }
-    }
-
-    public setPage(name: string): void {
+    public setPage(name: string, isRoot: boolean = false): void {
       let page: any = this.getPageByName(name);
       if(page) {
 
@@ -50,11 +37,23 @@ module pure {
           this.menu.close();
 
         let child: any = this.getChild(page);
+
+
+        if(isRoot) {
+          child.classList.add("active");
+          this.main.innerHTML = '';
+        }
+
         this.main.appendChild(child);
+        this.startController(child);
 
         this.onLoad(function() {
-          this.getPageByLengthLessIndex(2).classList.add("behind");
-          child.classList.add("active");
+
+          if(!isRoot) {
+            this.getPageContainsClass("active").page.classList.add("behind");
+            child.classList.add("active");
+          }
+
           child.style.paddingTop = new Header(child).getHeight() + "px";
           new Waves();
         }, 10);
@@ -62,19 +61,15 @@ module pure {
     }
 
     public pop(): void {
-      let pages: Array<any> = this.main.querySelectorAll("page");
-      for(let i = pages.length - 1; i > 0; i--) {
-        let page: any = pages[i];
-        if(page.classList.contains("active")) {
-          this.getPageByLengthLessIndex(2).classList.remove("behind");
-          page.classList.remove("active");
-
-          this.onLoad(function() {
-            this.main.removeChild(page);
-          }, this.timer);
-          return;
-        }
-      }
+      let active: any = this.getPageContainsClass("active");
+      let behind: any = this.getPageContainsClass("behind");
+      if(!active || active.index == 0) return;
+      behind.page.classList.remove("behind");
+      active.page.classList.remove("active");
+      this.startController(behind.page);
+      this.onLoad(function() {
+        this.main.removeChild(active.page);
+      }, this.timer);
     }
 
     public isRoot(): boolean {
@@ -94,17 +89,29 @@ module pure {
       return null;
     }
 
-    private getPageByLengthLessIndex(i: number = 1): any {
-      let pages = this.main.querySelectorAll("page");
-      return pages[pages.length - i];
+    private getPageContainsClass(className: string): any {
+      let pages: Array<any> = this.main.querySelectorAll("page");
+      for(let i = pages.length - 1; i >= 0; i--) {
+        if(pages[i].classList.contains(className))
+          return {page: pages[i], index: i};
+      }
+      return null;
     }
 
     private getChild(page: any): any {
       let child: any = document.createElement("page");
-      child.style.cssText = page.style.cssText;
-      child.classList = page.classList;
+      child.setAttribute("style", page.getAttribute("style"));
+      child.setAttribute("class", page.getAttribute("class"));
+      child.setAttribute("name", page.getAttribute("name"));
+      child.setAttribute("controller", page.getAttribute("controller"));
       child.innerHTML = page.innerHTML;
       return child;
+    }
+
+    private startController(page: any): void {
+      let controller = eval(page.getAttribute("controller"));
+      if(controller && typeof controller === "function")
+        controller(page);
     }
   }
 }

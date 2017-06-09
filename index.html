@@ -11,8 +11,8 @@
 
     <pure-menu>
       <content style="background-color: red">
-        <button onclick="navigation.setRoot('foo')">GO TO FOO</button>
-        <button onclick="navigation.setRoot('bar')">GO TO BAR</button>
+        <button onclick="navigation.setPage('foo', true)">GO TO FOO</button>
+        <button onclick="navigation.setPage('bar', true)">GO TO BAR</button>
         <p>teste</p>
         <p>teste</p>
         <p>teste</p>
@@ -66,7 +66,9 @@
 
     <pure-navigation>
 
-      <page name="foo">
+      <page name="foo" controller="fooCtrl">
+
+        <pure-refresher></pure-refresher>
 
         <pure-header style="background-color: blue;">
           <button onclick="navigation.pop();">Back</button>
@@ -77,73 +79,7 @@
         <button onclick="navigation.setPage('foo')">GO TO FOO</button>
         <button onclick="navigation.setPage('bar')">GO TO BAR</button>
 
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
-        <p>kkkkkk</p>
+
       </page>
 
       <page name="bar" style="background-color: red;">

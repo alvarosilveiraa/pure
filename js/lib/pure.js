@@ -16,6 +16,32 @@ var pure;
 })(pure || (pure = {}));
 var pure;
 (function (pure) {
+    var Touch = (function () {
+        function Touch() {
+        }
+        Touch.prototype.init = function (options) {
+            if (options === void 0) { options = {}; }
+            if (this.onStart && this.onMove && this.onEnd)
+                this.destroy();
+            this.element = options.element || window;
+            this.onStart = options.onStart;
+            this.onMove = options.onMove;
+            this.onEnd = options.onEnd;
+            this.element.addEventListener("touchstart", this.onStart);
+            this.element.addEventListener("touchmove", this.onMove, { passive: false });
+            this.element.addEventListener("touchend", this.onEnd);
+        };
+        Touch.prototype.destroy = function () {
+            this.element.removeEventListener("touchstart", this.onStart);
+            this.element.removeEventListener("touchmove", this.onMove, { passive: false });
+            this.element.removeEventListener("touchend", this.onEnd);
+        };
+        return Touch;
+    }());
+    pure.Touch = Touch;
+})(pure || (pure = {}));
+var pure;
+(function (pure) {
     var Header = (function () {
         function Header(page) {
             this.main = page.querySelector("pure-header");
@@ -33,6 +59,8 @@ var pure;
         function Menu(options) {
             if (options === void 0) { options = {}; }
             this.main = pure.$("pure-menu");
+            if (!this.main)
+                throw new Error("Elemento não encontrado!");
             this.side = options.side || "left";
             this.timer = options.timer || 300;
         }
@@ -65,7 +93,10 @@ var pure;
             if (options === void 0) { options = {}; }
             this.main = pure.$("pure-navigation");
             this.pages = this.main.querySelectorAll("page");
-            this.menu = options.menu || null;
+            try {
+                this.menu = new pure.Menu();
+            }
+            catch (e) { }
             this.os = options.os || "android";
             this.root = options.root || "home";
             this.timer = options.timer || 300;
@@ -74,57 +105,42 @@ var pure;
             if (this.menu)
                 this.menu.init();
             this.main.classList.add(this.os);
-            this.setRoot(this.root);
+            this.setPage(this.root, true);
         };
-        Navigation.prototype.setRoot = function (name) {
-            var root = this.getPageByName(name);
-            if (root) {
+        Navigation.prototype.setPage = function (name, isRoot) {
+            if (isRoot === void 0) { isRoot = false; }
+            var page = this.getPageByName(name);
+            if (page) {
                 if (this.menu && this.menu.active)
                     this.menu.close();
-                var child_1 = this.getChild(root);
-                child_1.classList.add("active");
-                this.main.innerHTML = '';
+                var child_1 = this.getChild(page);
+                if (isRoot) {
+                    child_1.classList.add("active");
+                    this.main.innerHTML = '';
+                }
                 this.main.appendChild(child_1);
+                this.startController(child_1);
                 this.onLoad(function () {
+                    if (!isRoot) {
+                        this.getPageContainsClass("active").page.classList.add("behind");
+                        child_1.classList.add("active");
+                    }
                     child_1.style.paddingTop = new pure.Header(child_1).getHeight() + "px";
                     new pure.Waves();
                 }, 10);
             }
         };
-        Navigation.prototype.setPage = function (name) {
-            var page = this.getPageByName(name);
-            if (page) {
-                if (this.menu && this.menu.active)
-                    this.menu.close();
-                var child_2 = this.getChild(page);
-                this.main.appendChild(child_2);
-                this.onLoad(function () {
-                    this.getPageByLengthLessIndex(2).classList.add("behind");
-                    child_2.classList.add("active");
-                    child_2.style.paddingTop = new pure.Header(child_2).getHeight() + "px";
-                    new pure.Waves();
-                }, 10);
-            }
-        };
         Navigation.prototype.pop = function () {
-            var pages = this.main.querySelectorAll("page");
-            var _loop_1 = function (i) {
-                var page = pages[i];
-                if (page.classList.contains("active")) {
-                    this_1.getPageByLengthLessIndex(2).classList.remove("behind");
-                    page.classList.remove("active");
-                    this_1.onLoad(function () {
-                        this.main.removeChild(page);
-                    }, this_1.timer);
-                    return { value: void 0 };
-                }
-            };
-            var this_1 = this;
-            for (var i = pages.length - 1; i > 0; i--) {
-                var state_1 = _loop_1(i);
-                if (typeof state_1 === "object")
-                    return state_1.value;
-            }
+            var active = this.getPageContainsClass("active");
+            var behind = this.getPageContainsClass("behind");
+            if (!active || active.index == 0)
+                return;
+            behind.page.classList.remove("behind");
+            active.page.classList.remove("active");
+            this.startController(behind.page);
+            this.onLoad(function () {
+                this.main.removeChild(active.page);
+            }, this.timer);
         };
         Navigation.prototype.isRoot = function () {
             return this.main.querySelectorAll("page").length == 1;
@@ -140,17 +156,27 @@ var pure;
             }
             return null;
         };
-        Navigation.prototype.getPageByLengthLessIndex = function (i) {
-            if (i === void 0) { i = 1; }
+        Navigation.prototype.getPageContainsClass = function (className) {
             var pages = this.main.querySelectorAll("page");
-            return pages[pages.length - i];
+            for (var i = pages.length - 1; i >= 0; i--) {
+                if (pages[i].classList.contains(className))
+                    return { page: pages[i], index: i };
+            }
+            return null;
         };
         Navigation.prototype.getChild = function (page) {
             var child = document.createElement("page");
             child.style.cssText = page.style.cssText;
             child.classList = page.classList;
+            child.setAttribute("name", page.getAttribute("name"));
+            child.setAttribute("controller", page.getAttribute("controller"));
             child.innerHTML = page.innerHTML;
             return child;
+        };
+        Navigation.prototype.startController = function (page) {
+            var controller = eval(page.getAttribute("controller"));
+            if (controller && typeof controller === "function")
+                controller(page);
         };
         return Navigation;
     }());
@@ -173,14 +199,14 @@ var pure;
     var Refresher = (function () {
         function Refresher(options) {
             if (options === void 0) { options = {}; }
-            this.refresher = options.refresher || pure.$("pure-refresher");
+            this.main = options.view.querySelector("pure-refresher") || pure.$("pure-refresher");
             this.max = options.max || 80;
             this.threshold = options.threshold || 60;
             this.reload = options.reload || 50;
             this.timer = options.timer || 300;
             this.loader = options.loader || "circle";
             this.blockeds = options.blockeds || [];
-            this.view = pure.$(options.view) || pure.$("body");
+            this.view = options.view || pure.$("body");
             this.state = "pending";
             this.distance = 0;
             this.resisted = 0;
@@ -191,11 +217,11 @@ var pure;
                 options.onRefresh.bind(this) :
                 function (done) { return done(); };
         }
-        Refresher.prototype.init = function () {
-            window.addEventListener("touchstart", this.onTouchStart.bind(this));
-            window.addEventListener("touchmove", this.onTouchMove.bind(this), { passive: false });
-            window.addEventListener("touchend", this.onTouchEnd.bind(this));
-        };
+        // public init(): void {
+        //   window.addEventListener("touchstart", this.onTouchStart.bind(this));
+        //   window.addEventListener("touchmove", this.onTouchMove.bind(this), <any>{passive: false});
+        //   window.addEventListener("touchend", this.onTouchEnd.bind(this));
+        // }
         Refresher.prototype.onTouchStart = function (e) {
             var _this = this;
             if (!this.view.scrollTop)
@@ -228,7 +254,7 @@ var pure;
                 return;
             }
             if (this.state === "pending") {
-                this.refresher.classList.add("pull");
+                this.main.classList.add("pull");
                 this.state = "pulling";
                 this.update();
             }
@@ -236,15 +262,15 @@ var pure;
                 this.distance = this.moveY - this.startY;
             if (this.distance > 0) {
                 e.preventDefault();
-                this.refresher.style["min-height"] = this.resisted + "px";
+                this.main.style["min-height"] = this.resisted + "px";
                 this.resisted = this.getResistance() * Math.min(this.max, this.distance);
                 if (this.state === "pulling" && this.resisted > this.threshold) {
-                    this.refresher.classList.add("release");
+                    this.main.classList.add("release");
                     this.state = "releasing";
                     this.update();
                 }
                 if (this.state === "releasing" && this.resisted < this.threshold) {
-                    this.refresher.classList.remove("release");
+                    this.main.classList.remove("release");
                     this.state = "pulling";
                     this.update();
                 }
@@ -253,8 +279,8 @@ var pure;
         Refresher.prototype.onTouchEnd = function () {
             if (this.state === "releasing" && this.resisted > this.threshold) {
                 this.state = "refreshing";
-                this.refresher.style["min-height"] = this.reload + "px";
-                this.refresher.classList.add("refresh");
+                this.main.style["min-height"] = this.reload + "px";
+                this.main.classList.add("refresh");
                 this.timeout = setTimeout(function () {
                     var retval = this.onRefresh(this.onReset.bind(this));
                     if (!retval && !this.onRefresh.length)
@@ -265,22 +291,22 @@ var pure;
                 if (this.state === "refreshing")
                     return;
                 this.state = "pending";
-                this.refresher.style["min-height"] = "0px";
+                this.main.style["min-height"] = "0px";
             }
             this.update();
-            this.refresher.classList.remove("pull");
-            this.refresher.classList.remove("release");
+            this.main.classList.remove("pull");
+            this.main.classList.remove("release");
             this.startY = this.moveY = 0;
             this.distance = this.resisted = 0;
         };
         Refresher.prototype.onReset = function () {
             this.state = "pending";
-            this.refresher.style["min-height"] = "0px";
-            this.refresher.classList.remove("refresh");
+            this.main.style["min-height"] = "0px";
+            this.main.classList.remove("refresh");
         };
         Refresher.prototype.update = function () {
             if (this.state === "refreshing") {
-                this.refresher.innerHTML = "<box><loader></loader></box>";
+                this.main.innerHTML = "<box><loader></loader></box>";
             }
             else {
                 var icon = this.getBoxIcon();
@@ -298,11 +324,11 @@ var pure;
             window.removeEventListener("touchend", this.onTouchEnd.bind(this));
         };
         Refresher.prototype.getBoxIcon = function () {
-            var box = this.refresher.querySelector("box"), icon = null;
+            var box = this.main.querySelector("box"), icon = null;
             if (box && box.querySelector("icon"))
                 return box.querySelector("icon");
-            this.refresher.innerHTML = '';
-            box = this.refresher.appendChild(document.createElement("box"));
+            this.main.innerHTML = '';
+            box = this.main.appendChild(document.createElement("box"));
             icon = document.createElement("icon");
             box.appendChild(icon);
             return icon;

@@ -14,7 +14,7 @@
 module pure {
   export class Refresher {
 
-    public refresher: any;
+    public main: any;
     public max: number;
     public threshold: number;
     public reload: number;
@@ -33,7 +33,7 @@ module pure {
     private timeout: number;
 
     constructor(options: any = {}) {
-      this.refresher = options.refresher || $("pure-refresher");
+      this.main = options.view.querySelector("pure-refresher") || $("pure-refresher");
       this.max = options.max || 80;
       this.threshold = options.threshold || 60;
       this.reload = options.reload || 50;
@@ -41,7 +41,7 @@ module pure {
       this.loader = options.loader || "circle";
       this.blockeds = options.blockeds || [];
 
-      this.view = $(options.view) || $("body");
+      this.view = options.view || $("body");
       this.state = "pending";
       this.distance = 0;
       this.resisted = 0;
@@ -53,13 +53,13 @@ module pure {
         done => done();
     }
 
-    public init(): void {
-      window.addEventListener("touchstart", this.onTouchStart.bind(this));
-      window.addEventListener("touchmove", this.onTouchMove.bind(this), <any>{passive: false});
-      window.addEventListener("touchend", this.onTouchEnd.bind(this));
-    }
+    // public init(): void {
+    //   window.addEventListener("touchstart", this.onTouchStart.bind(this));
+    //   window.addEventListener("touchmove", this.onTouchMove.bind(this), <any>{passive: false});
+    //   window.addEventListener("touchend", this.onTouchEnd.bind(this));
+    // }
 
-    private onTouchStart(e: any): void {
+    public onTouchStart(e: any): void {
       if(!this.view.scrollTop) this.startY = e.touches[0].screenY;
       if(this.state !== "pending") return;
       clearTimeout(this.timeout);
@@ -74,7 +74,7 @@ module pure {
       this.update();
     }
 
-    private onTouchMove(e: any): void {
+    public onTouchMove(e: any): void {
       if(!this.startY) {
         if(!this.view.scrollTop)
           this.startY = e.touches[0].screenY;
@@ -90,7 +90,7 @@ module pure {
       }
 
       if(this.state === "pending") {
-        this.refresher.classList.add("pull");
+        this.main.classList.add("pull");
         this.state = "pulling";
         this.update();
       }
@@ -100,28 +100,28 @@ module pure {
 
       if(this.distance > 0) {
         e.preventDefault();
-        this.refresher.style["min-height"] = this.resisted + "px";
+        this.main.style["min-height"] = this.resisted + "px";
         this.resisted = this.getResistance() * Math.min(this.max, this.distance);
 
         if(this.state === "pulling" && this.resisted > this.threshold) {
-          this.refresher.classList.add("release");
+          this.main.classList.add("release");
           this.state = "releasing";
           this.update();
         }
 
         if(this.state === "releasing" && this.resisted < this.threshold) {
-          this.refresher.classList.remove("release");
+          this.main.classList.remove("release");
           this.state = "pulling";
           this.update();
         }
       }
     }
 
-    private onTouchEnd(): void {
+    public onTouchEnd(): void {
       if(this.state === "releasing" &&  this.resisted > this.threshold) {
         this.state = "refreshing";
-        this.refresher.style["min-height"] = this.reload + "px";
-        this.refresher.classList.add("refresh");
+        this.main.style["min-height"] = this.reload + "px";
+        this.main.classList.add("refresh");
         this.timeout = setTimeout(function() {
           let retval = this.onRefresh(this.onReset.bind(this));
           if(!retval && !this.onRefresh.length) this.onReset();
@@ -129,24 +129,24 @@ module pure {
       }else {
         if(this.state === "refreshing") return;
         this.state = "pending";
-        this.refresher.style["min-height"] = "0px";
+        this.main.style["min-height"] = "0px";
       }
       this.update();
-      this.refresher.classList.remove("pull");
-      this.refresher.classList.remove("release");
+      this.main.classList.remove("pull");
+      this.main.classList.remove("release");
       this.startY = this.moveY = 0;
       this.distance = this.resisted = 0;
     }
 
     private onReset(): void {
       this.state = "pending";
-      this.refresher.style["min-height"] = "0px";
-      this.refresher.classList.remove("refresh");
+      this.main.style["min-height"] = "0px";
+      this.main.classList.remove("refresh");
     }
 
     private update(): void {
       if(this.state === "refreshing") {
-        this.refresher.innerHTML = "<box><loader></loader></box>";
+        this.main.innerHTML = "<box><loader></loader></box>";
       }else {
         let icon: any = this.getBoxIcon();
         if(this.state === "releasing") {
@@ -164,10 +164,10 @@ module pure {
     }
 
     private getBoxIcon(): any {
-      let box: any = this.refresher.querySelector("box"), icon: any = null;
+      let box: any = this.main.querySelector("box"), icon: any = null;
       if(box && box.querySelector("icon")) return box.querySelector("icon");
-      this.refresher.innerHTML = '';
-      box = this.refresher.appendChild(document.createElement("box"));
+      this.main.innerHTML = '';
+      box = this.main.appendChild(document.createElement("box"));
       icon = document.createElement("icon");
       box.appendChild(icon);
       return icon;

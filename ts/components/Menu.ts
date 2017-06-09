@@ -7,6 +7,7 @@ module pure {
 
     constructor(options: any = {}) {
       this.main = $("pure-menu");
+      if(!this.main) throw new Error("Elemento não encontrado!");
       this.side = options.side || "left";
       this.timer = options.timer || 300;
     }
