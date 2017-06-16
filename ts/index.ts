@@ -7,4 +7,4 @@ module pure {
 }
 
 
-// tsc index.ts components/Touch.ts components/Header.ts components/Menu.ts components/Navigation.ts components/Refresher.ts components/Slider.ts components/Waves.ts --out ../js/lib/pure.js
+// tsc index.ts lib/Touch.ts components/Header.ts components/Menu.ts components/Navigation.ts components/Refresher.ts components/Slider.ts components/Waves.ts --out ../js/lib/pure.js

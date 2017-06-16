@@ -1,0 +1,45 @@
+pure-slider {
+  overflow: hidden;
+  display: block;
+  position: relative;
+  margin: 0 auto;
+}
+
+pure-slider tabs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  z-index: 100;
+}
+
+pure-slider tabs tab {
+  display: block;
+  float: left;
+}
+
+pure-slider tabs tray {
+  position: absolute;
+  bottom: 0;
+  display: block;
+}
+
+pure-slider[orientation="horizontal"] slides {
+  touch-action: pan-y !important;
+  display: flex;
+}
+
+pure-slider[orientation="vertical"] slides {
+  touch-action: pan-x !important;
+  display: block;
+  width: 100%;
+}
+
+pure-slider slides slide {
+  overflow: hidden;
+  display: block;
+  width: 100%;
+}
