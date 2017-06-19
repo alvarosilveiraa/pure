@@ -1,0 +1,24 @@
+{
+  "name": "pure",
+  "version": "1.0.0",
+  "description": "> Pure javascript/css library for HTML development",
+  "main": "index.js",
+  "scripts": {
+    "build:sass": "node-sass -r ./css/pure.scss -o ./css",
+    "build:typescript": "tsc ./js/index.ts ./js/lib/Touch.ts ./js/components/AutoComplete.ts ./js/components/Navigation.ts --out ./js/pure.js",
+    "build": "npm run build:sass && npm run build:typescript"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alvarosilveiraa/pure.git"
+  },
+  "author": "Alvaro Silveira <alvarosilveiraa@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alvarosilveiraa/pure/issues"
+  },
+  "homepage": "https://github.com/alvarosilveiraa/pure#readme",
+  "devDependencies": {
+    "node-sass": "^4.5.3"
+  }
+}

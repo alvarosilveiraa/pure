@@ -16,3 +16,27 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes open-android {
+  from {
+    top: 100%;
+    left: 0;
+    right: 0;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes open-ios {
+  from {
+    top: 0;
+    left: 100%;
+    right: 0;
+  }
+  to {
+    left: 0;
+  }
+}
