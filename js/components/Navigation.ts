@@ -65,9 +65,12 @@ module pure {
     }
 
     private startController(page: any, params: any): void {
-      let controller: any = eval(page.getAttribute("controller"));
-      if(controller && typeof controller === "function")
-        controller(page, params);
+      let attr = page.getAttribute("controller");
+      let controller = eval(attr);
+
+      if(controller && typeof controller === "function") {
+        new controller(page, params);
+      }
     }
   }
 }

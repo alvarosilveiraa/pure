@@ -3,8 +3,8 @@ module pure {
 
     private timer: number;
 
-    constructor() {
-      this.timer = 800;
+    constructor(options: any = {}) {
+      this.timer = options.timer || 800;
 
       let waves: Array<any> = $all("[pure-waves]");
       for(let i = 0; i < waves.length; i++) {
@@ -19,7 +19,7 @@ module pure {
 
         //disabled return;
 
-        if(!element.style.position || element.style.position === "static")
+        if(getComputedStyle(element).position === "static")
           element.style.position = "relative";
 
         let offset: any = element.getBoundingClientRect();
@@ -28,10 +28,10 @@ module pure {
         let diameter: number = Math.min(offset.height, offset.width, 100);
 
         let container: any = document.createElement("div");
-        container.setAttribute("class", "wave-container");
+        container.classList.add("pure-waves");
         element.appendChild(container);
         let wave: any = document.createElement("div");
-        wave.setAttribute("class", "wave");
+        wave.classList.add("wave");
         wave.style.animation = `wave ${this.timer}ms forwards`;
         wave.style.backgroundColor = this.getAttribute(element.getAttribute("wave-color"));
         wave.style.width = diameter + "px";

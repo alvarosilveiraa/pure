@@ -1,16 +1,3 @@
-/***
-  options = {
-    onRefresh: any,
-    refresher: any,
-    max: number,
-    threshold: number,
-    reload: number,
-    timer: number,
-    loader: string,
-    blockeds: Array<string>
-  }
-***/
-
 module pure {
   export class Refresher {
 
@@ -33,7 +20,8 @@ module pure {
     private timeout: number;
 
     constructor(options: any = {}) {
-      this.main = options.view.querySelector("pure-refresher") || $("pure-refresher");
+      this.main = $("#pure-refresher");
+      if(!this.main) throw new Error("Elemento nao encontrado!");
       this.max = options.max || 80;
       this.threshold = options.threshold || 60;
       this.reload = options.reload || 50;
@@ -52,12 +40,6 @@ module pure {
         options.onRefresh.bind(this):
         done => done();
     }
-
-    // public init(): void {
-    //   window.addEventListener("touchstart", this.onTouchStart.bind(this));
-    //   window.addEventListener("touchmove", this.onTouchMove.bind(this), <any>{passive: false});
-    //   window.addEventListener("touchend", this.onTouchEnd.bind(this));
-    // }
 
     public onTouchStart(e: any): void {
       if(!this.view.scrollTop) this.startY = e.touches[0].screenY;
@@ -146,7 +128,7 @@ module pure {
 
     private update(): void {
       if(this.state === "refreshing") {
-        this.main.innerHTML = "<box><loader></loader></box>";
+        this.main.innerHTML = "<div class='box'><div class='loader'></div></div>";
       }else {
         let icon: any = this.getBoxIcon();
         if(this.state === "releasing") {
@@ -157,18 +139,14 @@ module pure {
       }
     }
 
-    private destroy(): void {
-      window.removeEventListener("touchstart", this.onTouchStart.bind(this));
-      window.removeEventListener("touchmove", this.onTouchMove.bind(this));
-      window.removeEventListener("touchend", this.onTouchEnd.bind(this));
-    }
-
     private getBoxIcon(): any {
-      let box: any = this.main.querySelector("box"), icon: any = null;
-      if(box && box.querySelector("icon")) return box.querySelector("icon");
+      let box: any = this.main.querySelector(".box"), icon: any = null;
+      if(box && box.querySelector("i")) return box.querySelector("i");
       this.main.innerHTML = '';
-      box = this.main.appendChild(document.createElement("box"));
-      icon = document.createElement("icon");
+      let element = document.createElement("div");
+      element.classList.add("box");
+      box = this.main.appendChild(element);
+      icon = document.createElement("i");
       box.appendChild(icon);
       return icon;
     }

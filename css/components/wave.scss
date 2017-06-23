@@ -1,4 +1,4 @@
-.wave-container {
+.pure-waves {
   pointer-events: none;
   overflow: hidden;
   position: absolute;
@@ -9,12 +9,12 @@
   transform: translateZ(0);
   border-radius: inherit;
   animation: wave-shadow 0.4s forwards;
-}
 
-.wave-container .wave {
-  backface-visibility: hidden;
-  position: absolute;
-  border-radius: 50%;
-  transform: scale(0.7);
-  opacity: 0.45;
+  .wave {
+    backface-visibility: hidden;
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0.7);
+    opacity: 0.45;
+  }
 }

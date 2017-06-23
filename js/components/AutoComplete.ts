@@ -5,30 +5,41 @@ module pure {
     public input: any;
     public items: any;
     private max: number;
+    private classItem: string;
     private words: Array<string>;
 
     constructor(options: any = {}) {
-      this.main = $("pure-autocomplete");
+      if(!options.view) throw new Error("Necessario informar uma view");
+      this.main = options.view.querySelector("[pure-autocomplete]");
+      if(!this.main) throw new Error("Elemento nao encontrado!");
       this.input = this.main.querySelector("input");
-      this.items = this.main.querySelector("items");
+      this.items = this.getItems();
       this.max = options.max || 4;
+      this.classItem = options.classItem || '';
       this.words = options.words || [];
+      this.startEvents();
     }
 
-    public init(): void {
+    private startEvents(): void {
       this.input.addEventListener("keyup", e => {
         this.removeItems();
-        if(this.input.value)
+        if(e.keyCode != 13 && this.input.value)
           this.setItems(this.input.value.toLowerCase());
       })
-
       window.addEventListener("click", e => {
         this.removeItems();
       })
     }
 
+    private getItems() {
+      let items: any = document.createElement("div");
+      items.classList.add("items");
+      this.main.appendChild(items);
+      return items;
+    }
+
     private removeItems(): void {
-      let items: Array<any> = this.items.querySelectorAll("item");
+      let items: Array<any> = this.items.querySelectorAll("span");
       for(let i = 0; i < items.length; i++) {
         this.items.removeChild(items[i]);
       }
@@ -42,7 +53,8 @@ module pure {
       for(let i = 0; i < this.max; i++) {
         if(filter[i]) {
           let word: string = filter[i].toLowerCase();
-          let item: any = document.createElement("item");
+          let item: any = document.createElement("span");
+          item.classList.add(this.classItem);
           item.innerHTML = word.replace(search, "<b>" + search + "</b>");
           item.addEventListener("click", e => {
             e.stopPropagation();

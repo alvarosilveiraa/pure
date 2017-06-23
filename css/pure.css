@@ -35,6 +35,9 @@
   to {
     left: 0; } }
 
+[pure-autocomplete] .items span {
+  display: block; }
+
 #pure-menu .pure-menu_content {
   overflow-x: hidden;
   overflow-y: auto;
@@ -103,7 +106,7 @@
       #pure-navigation[platform="ios"] [page].active.behind {
         left: -30%; }
 
-pure-refresher {
+#pure-refresher {
   text-align: center;
   pointer-events: none;
   overflow: hidden;
@@ -116,38 +119,32 @@ pure-refresher {
   background-color: #333;
   box-shadow: 0 -3px 5px rgba(0, 0, 0, 0.12) inset;
   transition: height 300ms, min-height 300ms; }
-
-pure-refresher.pull {
-  transition: none; }
-
-pure-refresher box {
-  flex-basis: 100%; }
-
-pure-refresher box loader {
-  margin: 0 auto;
-  display: block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite; }
-
-pure-refresher box icon {
-  margin: 0 auto;
-  width: 5px;
-  height: 5px;
-  display: block;
-  padding: 5px;
-  border: solid white;
-  border-width: 0 3px 3px 0;
-  transition: transform 200ms; }
-
-pure-refresher box icon.up {
-  transform: rotate(-135deg); }
-
-pure-refresher box icon.down {
-  transform: rotate(45deg); }
+  #pure-refresher.pull {
+    transition: none; }
+  #pure-refresher .box {
+    flex-basis: 100%; }
+    #pure-refresher .box .loader {
+      margin: 0 auto;
+      display: block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite; }
+    #pure-refresher .box i {
+      margin: 0 auto;
+      width: 5px;
+      height: 5px;
+      display: block;
+      padding: 5px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      transition: transform 200ms; }
+      #pure-refresher .box i.up {
+        transform: rotate(-135deg); }
+      #pure-refresher .box i.down {
+        transform: rotate(45deg); }
 
 pure-slider {
   overflow: hidden;
@@ -188,7 +185,7 @@ pure-slider slides slide {
   display: block;
   width: 100%; }
 
-.wave-container {
+.pure-waves {
   pointer-events: none;
   overflow: hidden;
   position: absolute;
@@ -199,10 +196,9 @@ pure-slider slides slide {
   transform: translateZ(0);
   border-radius: inherit;
   animation: wave-shadow 0.4s forwards; }
-
-.wave-container .wave {
-  backface-visibility: hidden;
-  position: absolute;
-  border-radius: 50%;
-  transform: scale(0.7);
-  opacity: 0.45; }
+  .pure-waves .wave {
+    backface-visibility: hidden;
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0.7);
+    opacity: 0.45; }
