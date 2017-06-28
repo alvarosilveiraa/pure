@@ -185,6 +185,23 @@ pure-slider slides slide {
   display: block;
   width: 100%; }
 
+.pure-tabs_btn {
+  position: relative;
+  overflow: hidden; }
+  .pure-tabs_btn [tab] {
+    float: left; }
+  .pure-tabs_btn .tray {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px; }
+
+.pure-tabs {
+  position: relative; }
+  .pure-tabs .tabs {
+    display: flex;
+    height: 100%; }
+
 .pure-waves {
   pointer-events: none;
   overflow: hidden;

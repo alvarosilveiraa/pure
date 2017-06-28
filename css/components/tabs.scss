@@ -1,0 +1,24 @@
+.pure-tabs_btn {
+  position: relative;
+  overflow: hidden;
+
+  [tab] {
+    float: left;
+  }
+
+  .tray {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+  }
+}
+
+.pure-tabs {
+  position: relative;
+
+  .tabs {
+    display: flex;
+    height: 100%;
+  }
+}

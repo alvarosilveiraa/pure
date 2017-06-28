@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build:sass": "node-sass -r ./css/pure.scss -o ./css",
-    "build:typescript": "tsc ./js/index.ts ./js/lib/Touch.ts ./js/components/Waves.ts ./js/components/AutoComplete.ts ./js/components/Navigation.ts --out ./js/pure.js",
+    "build:typescript": "tsc ./js/index.ts ./js/lib/Touch.ts ./js/components/Refresher.ts ./js/components/Tabs.ts ./js/components/Waves.ts ./js/components/AutoComplete.ts ./js/components/Navigation.ts --out ./js/pure.js",
     "build": "npm run build:sass && npm run build:typescript"
   },
   "repository": {

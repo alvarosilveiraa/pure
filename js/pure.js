@@ -32,6 +32,285 @@ var pure;
 })(pure || (pure = {}));
 var pure;
 (function (pure) {
+    var Refresher = (function () {
+        function Refresher(options) {
+            if (options === void 0) { options = {}; }
+            this.main = pure.$("#pure-refresher");
+            if (!this.main)
+                throw new Error("Elemento nao encontrado!");
+            this.max = options.max || 80;
+            this.threshold = options.threshold || 60;
+            this.reload = options.reload || 50;
+            this.timer = options.timer || 300;
+            this.loader = options.loader || "circle";
+            this.blockeds = options.blockeds || [];
+            this.view = options.view || pure.$("body");
+            this.state = "pending";
+            this.distance = 0;
+            this.resisted = 0;
+            this.startY = 0;
+            this.moveY = 0;
+            this.enable = false;
+            this.onRefresh = options.onRefresh ?
+                options.onRefresh.bind(this) :
+                function (done) { return done(); };
+        }
+        Refresher.prototype.onTouchStart = function (e) {
+            var _this = this;
+            if (!this.view.scrollTop)
+                this.startY = e.touches[0].screenY;
+            if (this.state !== "pending")
+                return;
+            clearTimeout(this.timeout);
+            this.state = "pending";
+            this.enable = this.view.contains(e.target);
+            if (this.blockeds.length > 0) {
+                this.blockeds.forEach(function (blocked) {
+                    if (_this.enable && pure.$(blocked).contains(e.target))
+                        _this.enable = false;
+                });
+            }
+            this.update();
+        };
+        Refresher.prototype.onTouchMove = function (e) {
+            if (!this.startY) {
+                if (!this.view.scrollTop)
+                    this.startY = e.touches[0].screenY;
+            }
+            else {
+                this.moveY = e.touches[0].screenY;
+            }
+            if (!this.enable || this.state === "refreshing") {
+                if (!this.view.scrollTop && this.startY < this.moveY) {
+                    e.preventDefault();
+                }
+                return;
+            }
+            if (this.state === "pending") {
+                this.main.classList.add("pull");
+                this.state = "pulling";
+                this.update();
+            }
+            if (this.startY && this.moveY)
+                this.distance = this.moveY - this.startY;
+            if (this.distance > 0) {
+                e.preventDefault();
+                this.main.style["min-height"] = this.resisted + "px";
+                this.resisted = this.getResistance() * Math.min(this.max, this.distance);
+                if (this.state === "pulling" && this.resisted > this.threshold) {
+                    this.main.classList.add("release");
+                    this.state = "releasing";
+                    this.update();
+                }
+                if (this.state === "releasing" && this.resisted < this.threshold) {
+                    this.main.classList.remove("release");
+                    this.state = "pulling";
+                    this.update();
+                }
+            }
+        };
+        Refresher.prototype.onTouchEnd = function () {
+            if (this.state === "releasing" && this.resisted > this.threshold) {
+                this.state = "refreshing";
+                this.main.style["min-height"] = this.reload + "px";
+                this.main.classList.add("refresh");
+                this.timeout = setTimeout(function () {
+                    var retval = this.onRefresh(this.onReset.bind(this));
+                    if (!retval && !this.onRefresh.length)
+                        this.onReset();
+                }.bind(this), this.timer);
+            }
+            else {
+                if (this.state === "refreshing")
+                    return;
+                this.state = "pending";
+                this.main.style["min-height"] = "0px";
+            }
+            this.update();
+            this.main.classList.remove("pull");
+            this.main.classList.remove("release");
+            this.startY = this.moveY = 0;
+            this.distance = this.resisted = 0;
+        };
+        Refresher.prototype.onReset = function () {
+            this.state = "pending";
+            this.main.style["min-height"] = "0px";
+            this.main.classList.remove("refresh");
+        };
+        Refresher.prototype.update = function () {
+            if (this.state === "refreshing") {
+                this.main.innerHTML = "<div class='box'><div class='loader'></div></div>";
+            }
+            else {
+                var icon = this.getBoxIcon();
+                if (this.state === "releasing") {
+                    icon.setAttribute("class", "up");
+                }
+                else if (this.state === "pending" || this.state === "pulling") {
+                    icon.setAttribute("class", "down");
+                }
+            }
+        };
+        Refresher.prototype.getBoxIcon = function () {
+            var box = this.main.querySelector(".box"), icon = null;
+            if (box && box.querySelector("i"))
+                return box.querySelector("i");
+            this.main.innerHTML = '';
+            var element = document.createElement("div");
+            element.classList.add("box");
+            box = this.main.appendChild(element);
+            icon = document.createElement("i");
+            box.appendChild(icon);
+            return icon;
+        };
+        Refresher.prototype.getResistance = function () {
+            return Math.min(1, (this.distance / this.threshold) / 2.5);
+        };
+        return Refresher;
+    }());
+    pure.Refresher = Refresher;
+})(pure || (pure = {}));
+var pure;
+(function (pure) {
+    var Tabs = (function () {
+        function Tabs(options) {
+            if (options === void 0) { options = {}; }
+            this.main = options.view ? options.view.querySelector(".pure-tabs") : pure.$(".pure-tabs");
+            if (!this.main)
+                throw new Error("Elemento não existe!");
+            this.tabs = options.view ? options.view.querySelector(".pure-tabs_btn") : pure.$(".pure-tabs_btn");
+            this.total = this.main.querySelectorAll("[tab]").length;
+            this.active = options.active || 0;
+            this.trayColor = options.trayColor || "#FFFFFF";
+            this.threshold = options.threshold || 80;
+            this.restraint = options.restraint || 100;
+            this.allowedTime = options.allowedTime || 300;
+            this.timer = options.timer || 200;
+            this.direction = "none";
+            this.startX = 0;
+            this.startY = 0;
+            this.timeout = 0;
+            this.startTime = 0;
+        }
+        Tabs.prototype.init = function () {
+            this.createTabs();
+            this.createPages();
+            this.createTray();
+        };
+        Tabs.prototype.onTouchStart = function (e) {
+            this.startX = e.touches[0].pageX;
+            this.startY = e.touches[0].pageY;
+            this.startTime = new Date().getTime();
+        };
+        Tabs.prototype.onTouchMove = function (e) {
+            var width = this.main.clientWidth;
+            var pageX = e.touches[0].pageX;
+            var pageY = e.touches[0].pageY;
+            var distX = pageX - this.startX;
+            var distY = pageY - this.startY;
+            this.setDirection(distX, distY);
+            var calc = this.active * width + (this.startX - pageX);
+            var percentage = calc * 100 / width;
+            this.setPan(percentage);
+        };
+        Tabs.prototype.onTouchEnd = function (e) {
+            var elapsedTime = new Date().getTime() - this.startTime;
+            if (this.isHorizontal() && elapsedTime <= this.allowedTime) {
+                this.update();
+            }
+            else {
+                this.setPan(100 * this.active);
+            }
+            this.setTransition();
+            this.direction = "none";
+        };
+        Tabs.prototype.update = function () {
+            this.setActive();
+            this.setPan(100 * this.active);
+            this.setTab();
+        };
+        Tabs.prototype.isHorizontal = function () {
+            return this.direction == "left" || this.direction == "right";
+        };
+        Tabs.prototype.setDirection = function (distX, distY) {
+            if (Math.abs(distX) >= this.threshold && Math.abs(distY) <= this.restraint) {
+                this.direction = (distX < 0) ? 'left' : 'right';
+            }
+            else if (Math.abs(distY) >= this.threshold && Math.abs(distX) <= this.restraint) {
+                this.direction = (distY < 0) ? 'up' : 'down';
+            }
+        };
+        Tabs.prototype.setActive = function () {
+            if (this.direction == "left" && this.active < this.total - 1)
+                this.active++;
+            else if (this.direction == "right" && this.active > 0)
+                this.active--;
+        };
+        Tabs.prototype.setPan = function (percentage) {
+            if (percentage >= 0 && percentage <= 100 * (this.total - 1)) {
+                this.main.querySelector(".tabs").style.transform = "translateX(" + (percentage * -1) / this.total + "%)";
+                var tray = this.tabs.querySelector(".tray");
+                tray.style.left = percentage / this.total + "%";
+            }
+        };
+        Tabs.prototype.setTab = function () {
+            var tabs = this.tabs.querySelectorAll("[tab]");
+            for (var i = 0; i < this.total; i++) {
+                tabs[i].classList.remove("active");
+            }
+            tabs[this.active].classList.add("active");
+        };
+        Tabs.prototype.setTransition = function () {
+            var tray = this.tabs.querySelector(".tray");
+            var tabs = this.main.querySelector(".tabs");
+            tray.style.transition = "left " + this.timer + "ms";
+            tabs.style.transition = "transform " + this.timer + "ms";
+            this.timeout = setTimeout(function () {
+                tray.style.transition = '';
+                tabs.style.transition = '';
+            }, this.timer);
+        };
+        Tabs.prototype.createTabs = function () {
+            var _this = this;
+            var tabs = this.tabs.querySelectorAll("[tab]");
+            var _loop_1 = function (i) {
+                var tab = tabs[i];
+                tab.style.width = 100 / this_1.total + "%";
+                tab.addEventListener("click", function (e) {
+                    _this.active = i;
+                    _this.setTab();
+                    _this.setPan(100 * i);
+                    _this.setTransition();
+                });
+            };
+            var this_1 = this;
+            for (var i = 0; i < this.total; i++) {
+                _loop_1(i);
+            }
+            tabs[this.active].classList.add("active");
+        };
+        Tabs.prototype.createPages = function () {
+            var pages = this.main.querySelectorAll("[tab]");
+            for (var i = 0; i < this.total; i++) {
+                pages[i].style.width = 100 / this.total + "%";
+            }
+            this.main.querySelector(".tabs").style.width = 100 * this.total + "%";
+            this.main.querySelector(".tabs").style.transform = "translateX(" + (-100 * this.active) / this.total + "%)";
+        };
+        Tabs.prototype.createTray = function () {
+            var tray = document.createElement("div");
+            tray.classList.add("tray");
+            tray.style.width = 100 / this.total + "%";
+            tray.style.left = this.active * (100 / this.total) + "%";
+            tray.style.backgroundColor = this.trayColor;
+            this.tabs.appendChild(tray);
+        };
+        return Tabs;
+    }());
+    pure.Tabs = Tabs;
+})(pure || (pure = {}));
+var pure;
+(function (pure) {
     var Waves = (function () {
         function Waves(options) {
             if (options === void 0) { options = {}; }
@@ -122,11 +401,11 @@ var pure;
             var filter = this.words.filter(function (word) {
                 return new RegExp(search, 'i').test(word);
             });
-            var _loop_1 = function (i) {
+            var _loop_2 = function (i) {
                 if (filter[i]) {
                     var word_1 = filter[i].toLowerCase();
                     var item = document.createElement("span");
-                    item.classList.add(this_1.classItem);
+                    item.classList.add(this_2.classItem);
                     item.innerHTML = word_1.replace(search, "<b>" + search + "</b>");
                     item.addEventListener("click", function (e) {
                         e.stopPropagation();
@@ -134,12 +413,12 @@ var pure;
                         _this.input.focus();
                         _this.removeItems();
                     });
-                    this_1.items.appendChild(item);
+                    this_2.items.appendChild(item);
                 }
             };
-            var this_1 = this;
+            var this_2 = this;
             for (var i = 0; i < this.max; i++) {
-                _loop_1(i);
+                _loop_2(i);
             }
         };
         return AutoComplete;
