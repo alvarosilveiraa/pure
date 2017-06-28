@@ -18,6 +18,8 @@ module pure {
     private startTime: number;
     private trayColor: string;
 
+    private sensitivity: number;
+
     constructor(options: any = {}) {
       this.main = options.view? options.view.querySelector(".pure-tabs"): $(".pure-tabs");
       if(!this.main) throw new Error("Elemento não existe!");
@@ -34,6 +36,8 @@ module pure {
       this.startY = 0;
       this.timeout = 0;
       this.startTime = 0;
+
+      this.sensitivity = 0;
     }
 
     public init(): void {
@@ -57,6 +61,9 @@ module pure {
       this.setDirection(distX, distY);
       let calc = this.active * width + (this.startX - pageX);
       let percentage = calc * 100 / width;
+
+      this.sensitivity = 100 / this.total * (this.startX - pageX) / width;
+
       this.setPan(percentage);
     }
 
@@ -65,6 +72,10 @@ module pure {
       if(this.isHorizontal() && elapsedTime <= this.allowedTime) {
         this.update();
       }else {
+        if(this.sensitivity <= -(25 / this.total))
+          this.active--;
+        else if(this.sensitivity >= 25 / this.total)
+          this.active++;
         this.setPan(100 * this.active);
       }
       this.setTransition();

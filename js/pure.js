@@ -191,6 +191,7 @@ var pure;
             this.startY = 0;
             this.timeout = 0;
             this.startTime = 0;
+            this.sensitivity = 0;
         }
         Tabs.prototype.init = function () {
             this.createTabs();
@@ -211,6 +212,7 @@ var pure;
             this.setDirection(distX, distY);
             var calc = this.active * width + (this.startX - pageX);
             var percentage = calc * 100 / width;
+            this.sensitivity = 100 / this.total * (this.startX - pageX) / width;
             this.setPan(percentage);
         };
         Tabs.prototype.onTouchEnd = function (e) {
@@ -219,6 +221,10 @@ var pure;
                 this.update();
             }
             else {
+                if (this.sensitivity <= -(25 / this.total))
+                    this.active--;
+                else if (this.sensitivity >= 25 / this.total)
+                    this.active++;
                 this.setPan(100 * this.active);
             }
             this.setTransition();
